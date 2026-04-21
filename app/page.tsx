@@ -138,6 +138,12 @@ const sectionMeta = [
   },
 ] as const
 
+type SectionId = (typeof sectionMeta)[number]["id"]
+
+function isSectionId(value: string): value is SectionId {
+  return (sectionMeta as readonly { id: string }[]).some((section) => section.id === value)
+}
+
 type RoomAssumptions = {
   tvLocations: number
   wifiAccessPoints: number
@@ -192,7 +198,7 @@ function picsumHero(seed: string, width = 1600, height = 1000) {
 type HeroVisual = { src: string; alt: string }
 
 function buildHeroVisual(args: {
-  activeSectionId: string
+  activeSectionId: SectionId
   totalRooms: number
   tvChoice: string
   securityChoice: string
@@ -382,7 +388,7 @@ export default function Page() {
     startingAssumptions.outdoorShadeCount
   )
   const [automationChoice, setAutomationChoice] = useState(automationOptions[0].id)
-  const [activeSectionId, setActiveSectionId] = useState(sectionMeta[0].id)
+  const [activeSectionId, setActiveSectionId] = useState<SectionId>(sectionMeta[0].id)
   const [assumptionsOpen, setAssumptionsOpen] = useState(false)
   const assumptionsPanelId = useId()
 
@@ -462,7 +468,8 @@ export default function Page() {
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
         if (visible?.target.id) {
-          setActiveSectionId(visible.target.id)
+          const nextId = visible.target.id
+          if (isSectionId(nextId)) setActiveSectionId(nextId)
         }
       },
       { threshold: [0.35, 0.55, 0.75], rootMargin: "-20% 0px -40% 0px" }
