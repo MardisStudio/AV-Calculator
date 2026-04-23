@@ -18,6 +18,7 @@ import {
 import { AnimatePresence, motion } from "motion/react"
 
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 type Option = { id: string; label: string; basePrice: number }
 
@@ -320,6 +321,99 @@ function buildHeroVisual(args: {
   }
 }
 
+type HeroStageProps = {
+  heroVisual: HeroVisual
+  activeSection: (typeof sectionMeta)[number]
+  activeSectionIndex: number
+  totalSteps: number
+  estimateText: string
+  onNext: () => void
+  nextDisabled: boolean
+  imageSizes: string
+  imagePriority: boolean
+  heroHeightClass: string
+  className?: string
+}
+
+function HeroStage({
+  heroVisual,
+  activeSection,
+  activeSectionIndex,
+  totalSteps,
+  estimateText,
+  onNext,
+  nextDisabled,
+  imageSizes,
+  imagePriority,
+  heroHeightClass,
+  className,
+}: HeroStageProps) {
+  const SectionIcon = activeSection.Icon
+
+  return (
+    <div className={cn("overflow-hidden rounded-3xl border bg-card", className)}>
+      <div className={cn("relative w-full", heroHeightClass)}>
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={heroVisual.src}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={heroVisual.src}
+              alt={heroVisual.alt}
+              fill
+              sizes={imageSizes}
+              priority={imagePriority}
+              className="object-cover object-center sm:object-left"
+            />
+          </motion.div>
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/55 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSection.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.28, ease: "easeOut" }}
+              className="rounded-2xl border bg-card/90 p-4 backdrop-blur sm:p-5"
+            >
+              <div className="mb-2 flex items-center gap-2 sm:mb-3">
+                <SectionIcon className="size-5 text-primary" />
+                <p className="text-xs text-muted-foreground sm:text-sm">
+                  Step {activeSectionIndex + 1} of {totalSteps}
+                </p>
+              </div>
+              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{activeSection.title}</h2>
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{activeSection.subtitle}</p>
+              <div className="mt-4 flex flex-col gap-3 sm:mt-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Current estimate</p>
+                  <p className="text-xl font-semibold sm:text-2xl">{estimateText}</p>
+                </div>
+                <Button
+                  type="button"
+                  size="lg"
+                  className="w-full touch-manipulation sm:w-auto"
+                  onClick={onNext}
+                  disabled={nextDisabled}
+                >
+                  Next <RiArrowRightLine className="ml-1 size-4" />
+                </Button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 type OptionCardProps = {
   selected: boolean
   label: string
@@ -332,14 +426,15 @@ function OptionCard({ selected, label, priceText, onClick }: OptionCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-2xl border p-4 text-left transition-all ${
+      className={cn(
+        "min-h-[3.25rem] touch-manipulation rounded-2xl border p-3.5 text-left transition-all sm:min-h-0 sm:p-4",
         selected
           ? "border-primary bg-primary/5 shadow-[0_0_0_1px_hsl(var(--primary)/0.25)]"
-          : "border-border hover:border-primary/45"
-      }`}
+          : "border-border hover:border-primary/45 active:bg-muted/40"
+      )}
     >
-      <p className="text-sm font-medium leading-snug">{label}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{priceText}</p>
+      <p className="text-base font-medium leading-snug sm:text-sm">{label}</p>
+      <p className="mt-1 text-sm text-muted-foreground sm:text-xs">{priceText}</p>
     </button>
   )
 }
@@ -358,9 +453,10 @@ function QuantityInput({ label, value, min, onChange }: QuantityInputProps) {
       <input
         type="number"
         min={min}
+        inputMode="numeric"
         value={value}
         onChange={(event) => onChange(Math.max(min, Number(event.target.value) || min))}
-        className="w-full rounded-lg border bg-background px-3 py-2"
+        className="min-h-11 w-full rounded-lg border bg-background px-3 py-2.5 text-base sm:min-h-0 sm:py-2 sm:text-sm"
       />
     </label>
   )
@@ -530,66 +626,41 @@ export default function Page() {
   )
 
   return (
-    <main className="min-h-svh bg-background px-4 pb-14 pt-6 text-foreground md:px-8 lg:px-10">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+    <main className="min-h-svh bg-background px-4 pb-[calc(3.5rem+env(safe-area-inset-bottom))] pt-[calc(1.5rem+env(safe-area-inset-top))] text-foreground md:px-8 lg:px-10">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-6 sm:gap-8 lg:grid-cols-[1.08fr_0.92fr]">
         <aside className="hidden lg:block">
-          <div className="sticky top-6 overflow-hidden rounded-3xl border bg-card">
-            <div className="relative h-[82vh] min-h-[700px]">
-              <AnimatePresence initial={false}>
-                <motion.div
-                  key={heroVisual.src}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.45, ease: "easeOut" }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src={heroVisual.src}
-                    alt={heroVisual.alt}
-                    fill
-                    sizes="(min-width: 1024px) 55vw, 100vw"
-                    priority={activeSectionId === sectionMeta[0].id}
-                    className="object-cover object-left"
-                  />
-                </motion.div>
-              </AnimatePresence>
-              <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/55 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeSection.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.28, ease: "easeOut" }}
-                    className="rounded-2xl border bg-card/90 p-5 backdrop-blur"
-                  >
-                    <div className="mb-3 flex items-center gap-2">
-                      <activeSection.Icon className="size-5 text-primary" />
-                      <p className="text-sm text-muted-foreground">
-                        Step {activeSectionIndex + 1} of {sectionMeta.length}
-                      </p>
-                    </div>
-                    <h2 className="text-2xl font-semibold tracking-tight">{activeSection.title}</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">{activeSection.subtitle}</p>
-                    <div className="mt-5 flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-muted-foreground">Current estimate</p>
-                        <p className="text-2xl font-semibold">{money(summary.total)}</p>
-                      </div>
-                      <Button onClick={goNext} disabled={activeSectionIndex === sectionMeta.length - 1}>
-                        Next <RiArrowRightLine className="ml-1 size-4" />
-                      </Button>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </div>
+          <div className="sticky top-6">
+            <HeroStage
+              heroVisual={heroVisual}
+              activeSection={activeSection}
+              activeSectionIndex={activeSectionIndex}
+              totalSteps={sectionMeta.length}
+              estimateText={money(summary.total)}
+              onNext={goNext}
+              nextDisabled={activeSectionIndex === sectionMeta.length - 1}
+              imageSizes="(min-width: 1024px) 55vw, 100vw"
+              imagePriority={activeSectionId === sectionMeta[0].id}
+              heroHeightClass="h-[82vh] min-h-[700px]"
+            />
           </div>
         </aside>
 
-        <section className="space-y-10 md:space-y-12">
+        <section className="space-y-8 sm:space-y-10 md:space-y-12">
+          <div className="lg:hidden">
+            <HeroStage
+              heroVisual={heroVisual}
+              activeSection={activeSection}
+              activeSectionIndex={activeSectionIndex}
+              totalSteps={sectionMeta.length}
+              estimateText={money(summary.total)}
+              onNext={goNext}
+              nextDisabled={activeSectionIndex === sectionMeta.length - 1}
+              imageSizes="100vw"
+              imagePriority={activeSectionId === sectionMeta[0].id}
+              heroHeightClass="min-h-[220px] h-[min(42dvh,24rem)] sm:aspect-[16/10] sm:h-auto sm:min-h-[260px] sm:max-h-[min(52vh,28rem)]"
+            />
+          </div>
+
           <motion.header
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -597,42 +668,53 @@ export default function Page() {
             className="space-y-2"
           >
             <p className="text-sm text-muted-foreground">AV App Budgeting Menu</p>
-            <h1 className="text-3xl font-semibold tracking-tight">A guided AV planning experience</h1>
+            <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+              A guided AV planning experience
+            </h1>
             <p className="max-w-2xl text-sm text-muted-foreground">
               Start with room count, then scroll section by section. Counts pre-fill from your room
               total so you can refine instead of starting from zero.
             </p>
           </motion.header>
 
-          <div className="sticky top-2 z-20 rounded-2xl border bg-background/95 px-2 py-2 backdrop-blur sm:px-3">
+          <div className="sticky top-[max(0.5rem,env(safe-area-inset-top))] z-20 rounded-2xl border bg-background/95 px-2 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-3">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="shrink-0 text-xs text-muted-foreground">
-                Step {activeSectionIndex + 1} / {sectionMeta.length}
+              <div className="shrink-0 tabular-nums text-muted-foreground">
+                <span className="text-[0.7rem] font-medium sm:hidden">
+                  {activeSectionIndex + 1}/{sectionMeta.length}
+                </span>
+                <span className="hidden text-xs sm:inline">
+                  Step {activeSectionIndex + 1} / {sectionMeta.length}
+                </span>
               </div>
 
               <div className="min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div className="flex min-w-max items-center justify-center gap-1.5 sm:gap-2">
+                <div className="flex min-w-max items-center justify-center gap-1.5 px-0.5 py-0.5 sm:gap-2">
                   {sectionMeta.map((section) => {
                     const isActive = section.id === activeSectionId
                     return (
                       <button
                         key={section.id}
                         type="button"
+                        title={section.title}
+                        aria-label={section.title}
+                        aria-current={isActive ? "step" : undefined}
                         onClick={() => goToSection(section.id)}
-                        className={`shrink-0 rounded-lg px-2 py-1.5 text-xs transition ${
+                        className={cn(
+                          "touch-manipulation rounded-xl p-2.5 text-xs transition sm:rounded-lg sm:px-2 sm:py-1.5",
                           isActive
                             ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground hover:bg-muted/70"
-                        }`}
+                            : "bg-muted text-muted-foreground hover:bg-muted/70 active:bg-muted/90"
+                        )}
                       >
-                        <section.Icon className="mx-auto size-4" />
+                        <section.Icon className="mx-auto size-[1.125rem] sm:size-4" />
                       </button>
                     )
                   })}
                 </div>
               </div>
 
-              <div className="shrink-0 text-xs font-medium tabular-nums text-foreground">
+              <div className="min-w-0 max-w-[46%] shrink-0 truncate text-right text-[0.7rem] font-medium tabular-nums text-foreground sm:max-w-none sm:text-xs">
                 {money(summary.total)}
               </div>
             </div>
@@ -947,16 +1029,23 @@ export default function Page() {
             className="rounded-3xl border bg-card p-5 md:p-6"
           >
             <p className="text-sm text-muted-foreground">Estimated investment</p>
-            <h3 className="mt-1 text-3xl font-semibold">{money(summary.total)}</h3>
+            <h3 className="mt-1 text-2xl font-semibold tabular-nums sm:text-3xl">{money(summary.total)}</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               {money(summary.monthlyLow)} - {money(summary.monthlyHigh)} / month
             </p>
 
             <div className="mt-4 space-y-2 border-t pt-4">
               {summary.items.map((item) => (
-                <div key={item.label} className="flex items-start justify-between gap-3 text-sm">
-                  <p className="text-muted-foreground">{item.label}</p>
-                  <p className="whitespace-nowrap font-medium">{money(item.total)}</p>
+                <div
+                  key={item.label}
+                  className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-sm"
+                >
+                  <p className="min-w-0 max-w-full flex-1 basis-[min(100%,12rem)] text-muted-foreground sm:basis-auto">
+                    {item.label}
+                  </p>
+                  <p className="ml-auto shrink-0 font-medium tabular-nums sm:whitespace-nowrap">
+                    {money(item.total)}
+                  </p>
                 </div>
               ))}
             </div>
