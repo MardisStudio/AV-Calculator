@@ -351,8 +351,8 @@ function HeroStage({
   const SectionIcon = activeSection.Icon
 
   return (
-    <div className={cn("overflow-hidden rounded-3xl border bg-card", className)}>
-      <div className={cn("relative w-full", heroHeightClass)}>
+    <div className={cn("max-w-full overflow-hidden rounded-3xl border bg-card", className)}>
+      <div className={cn("relative min-w-0 max-w-full w-full", heroHeightClass)}>
         <AnimatePresence initial={false}>
           <motion.div
             key={heroVisual.src}
@@ -381,16 +381,20 @@ function HeroStage({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.28, ease: "easeOut" }}
-              className="rounded-2xl border bg-card/90 p-4 backdrop-blur sm:p-5"
+              className="max-w-full rounded-2xl border bg-card/90 p-4 backdrop-blur sm:p-5"
             >
-              <div className="mb-2 flex items-center gap-2 sm:mb-3">
+              <div className="mb-2 flex min-w-0 items-center gap-2 sm:mb-3">
                 <SectionIcon className="size-5 text-primary" />
                 <p className="text-xs text-muted-foreground sm:text-sm">
                   Step {activeSectionIndex + 1} of {totalSteps}
                 </p>
               </div>
-              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{activeSection.title}</h2>
-              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{activeSection.subtitle}</p>
+              <h2 className="text-balance text-xl font-semibold tracking-tight sm:text-2xl">
+                {activeSection.title}
+              </h2>
+              <p className="mt-1 text-pretty text-xs text-muted-foreground sm:text-sm">
+                {activeSection.subtitle}
+              </p>
               <div className="mt-4 flex flex-col gap-3 sm:mt-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Current estimate</p>
@@ -626,10 +630,10 @@ export default function Page() {
   )
 
   return (
-    <main className="min-h-svh bg-background px-4 pb-[calc(3.5rem+env(safe-area-inset-bottom))] pt-[calc(1.5rem+env(safe-area-inset-top))] text-foreground md:px-8 lg:px-10">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-6 sm:gap-8 lg:grid-cols-[1.08fr_0.92fr]">
-        <aside className="hidden lg:block">
-          <div className="sticky top-6">
+    <main className="min-h-svh w-full min-w-0 max-w-full bg-background px-4 pb-[calc(3.5rem+env(safe-area-inset-bottom))] pt-[calc(1.5rem+env(safe-area-inset-top))] text-foreground md:px-8 lg:px-10">
+      <div className="mx-auto grid w-full min-w-0 max-w-full gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+        <aside className="hidden min-w-0 lg:block">
+          <div className="sticky top-6 min-w-0">
             <HeroStage
               heroVisual={heroVisual}
               activeSection={activeSection}
@@ -638,14 +642,14 @@ export default function Page() {
               estimateText={money(summary.total)}
               onNext={goNext}
               nextDisabled={activeSectionIndex === sectionMeta.length - 1}
-              imageSizes="(min-width: 1024px) 55vw, 100vw"
+              imageSizes="(min-width: 1024px) 55vw, 100dvw"
               imagePriority={activeSectionId === sectionMeta[0].id}
               heroHeightClass="h-[82vh] min-h-[700px]"
             />
           </div>
         </aside>
 
-        <section className="space-y-8 sm:space-y-10 md:space-y-12">
+        <section className="min-w-0 space-y-8 sm:space-y-10 md:space-y-12">
           <div className="lg:hidden">
             <HeroStage
               heroVisual={heroVisual}
@@ -655,7 +659,7 @@ export default function Page() {
               estimateText={money(summary.total)}
               onNext={goNext}
               nextDisabled={activeSectionIndex === sectionMeta.length - 1}
-              imageSizes="100vw"
+              imageSizes="100dvw"
               imagePriority={activeSectionId === sectionMeta[0].id}
               heroHeightClass="min-h-[220px] h-[min(42dvh,24rem)] sm:aspect-[16/10] sm:h-auto sm:min-h-[260px] sm:max-h-[min(52vh,28rem)]"
             />
@@ -677,8 +681,8 @@ export default function Page() {
             </p>
           </motion.header>
 
-          <div className="sticky top-[max(0.5rem,env(safe-area-inset-top))] z-20 rounded-2xl border bg-background/95 px-2 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-3">
-            <div className="flex items-center gap-2 sm:gap-3">
+          <div className="sticky top-[max(0.5rem,env(safe-area-inset-top))] z-20 w-full min-w-0 max-w-full rounded-2xl border bg-background/95 px-2 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-3">
+            <div className="flex min-w-0 w-full max-w-full items-center gap-2 sm:gap-3">
               <div className="shrink-0 tabular-nums text-muted-foreground">
                 <span className="text-[0.7rem] font-medium sm:hidden">
                   {activeSectionIndex + 1}/{sectionMeta.length}
@@ -728,7 +732,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.28 }}
-            className="space-y-5 rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 space-y-5 rounded-3xl border bg-card p-5 md:p-6"
           >
             <h2 className="flex items-center gap-2 text-xl font-medium">
               <RiHome4Line className="size-5 text-primary" /> How many rooms?
@@ -805,7 +809,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.28 }}
-            className="space-y-5 rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 space-y-5 rounded-3xl border bg-card p-5 md:p-6"
           >
             <h2 className="flex items-center gap-2 text-xl font-medium">
               <RiTv2Line className="size-5 text-primary" /> Pre-wire: TV locations
@@ -837,7 +841,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.28 }}
-            className="space-y-5 rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 space-y-5 rounded-3xl border bg-card p-5 md:p-6"
           >
             <h2 className="flex items-center gap-2 text-xl font-medium">
               <RiLock2Line className="size-5 text-primary" /> Security - Alarm & surveillance
@@ -863,7 +867,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.28 }}
-            className="space-y-5 rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 space-y-5 rounded-3xl border bg-card p-5 md:p-6"
           >
             <h2 className="flex items-center gap-2 text-xl font-medium">
               <RiRouterLine className="size-5 text-primary" /> Network
@@ -892,7 +896,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.28 }}
-            className="space-y-5 rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 space-y-5 rounded-3xl border bg-card p-5 md:p-6"
           >
             <h2 className="flex items-center gap-2 text-xl font-medium">
               <RiSoundModuleLine className="size-5 text-primary" /> House audio
@@ -924,7 +928,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.28 }}
-            className="space-y-5 rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 space-y-5 rounded-3xl border bg-card p-5 md:p-6"
           >
             <h2 className="flex items-center gap-2 text-xl font-medium">
               <RiLightbulbFlashLine className="size-5 text-primary" /> Automated lighting
@@ -950,7 +954,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.28 }}
-            className="space-y-5 rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 space-y-5 rounded-3xl border bg-card p-5 md:p-6"
           >
             <h2 className="flex items-center gap-2 text-xl font-medium">
               <RiCameraLensLine className="size-5 text-primary" /> Automated shades
@@ -1004,7 +1008,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.28 }}
-            className="space-y-5 rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 space-y-5 rounded-3xl border bg-card p-5 md:p-6"
           >
             <h2 className="flex items-center gap-2 text-xl font-medium">
               <RiHomeGearLine className="size-5 text-primary" /> Whole home automation
@@ -1026,7 +1030,7 @@ export default function Page() {
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.8 }}
-            className="rounded-3xl border bg-card p-5 md:p-6"
+            className="max-w-full min-w-0 rounded-3xl border bg-card p-5 md:p-6"
           >
             <p className="text-sm text-muted-foreground">Estimated investment</p>
             <h3 className="mt-1 text-2xl font-semibold tabular-nums sm:text-3xl">{money(summary.total)}</h3>
