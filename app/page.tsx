@@ -242,13 +242,16 @@ function buildHeroVisual(args: {
     }
     case "tv": {
       const map: Record<string, { seed: string; alt: string }> = {
-        "tv-stereo": { seed: "av-tv-stereo", alt: "Living room TV with stereo speakers" },
-        "tv-soundbar": { seed: "av-tv-soundbar", alt: "Slim soundbar under a wall-mounted TV" },
-        "tv-surround": { seed: "av-tv-surround", alt: "Home theater with surround speakers" },
-        "tv-only": { seed: "av-tv-only", alt: "Minimal TV installation without external audio" },
+        "tv-stereo": { seed: "/hero/tv-stereo.png", alt: "Living room TV with stereo speakers" },
+        "tv-soundbar": {
+          seed: "/hero/tv-soundbar.png",
+          alt: "Slim soundbar under a wall-mounted TV",
+        },
+        "tv-surround": { seed: "/hero/tv-surround.png", alt: "Home theater with surround speakers" },
+        "tv-only": { seed: "/hero/tv-only.png", alt: "Minimal TV installation without external audio" },
       }
       const picked = map[tvChoice] ?? map["tv-stereo"]
-      return { src: picsumHero(picked.seed), alt: picked.alt }
+      return { src: picked.seed, alt: picked.alt }
     }
     case "security": {
       const map: Record<string, { seed: string; alt: string }> = {
